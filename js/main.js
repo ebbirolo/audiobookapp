@@ -1,4 +1,4 @@
-// Main JavaScript for Audiobook PWA with TTS and Dark Mode
+// Main JavaScript for Audiobook PWA with TTS, Dark Mode, and View Management
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Audiobook PWA with TTS loaded');
 
@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const pitchSlider = document.getElementById('pitch');
     const statusEl = document.getElementById('status');
     const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const kindleBtn = document.getElementById('kindle-btn');
+    const backToMainBtn = document.getElementById('back-to-main');
+    const mainView = document.getElementById('main-view');
+    const kindleView = document.getElementById('kindle-view');
 
     // Speech synthesis
     let utterance = null;
@@ -170,11 +174,23 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const updateDarkModeIcon = (isDark) => {
+        // Using simple black/white characters that will inherit text color
         if (isDark) {
-            darkModeToggle.textContent = '☀️'; // Sun for light mode (when currently in dark)
+            darkModeToggle.textContent = '○'; // White circle for sun (when in dark mode, show option to go to light)
         } else {
-            darkModeToggle.textContent = '🌙'; // Moon for dark mode (when currently in light)
+            darkModeToggle.textContent = '◐'; // Circle with left half black for moon (when in light mode, show option to go to dark)
         }
+    };
+
+    // View management
+    const showMainView = () => {
+        mainView.style.display = 'flex';
+        kindleView.style.display = 'none';
+    };
+
+    const showKindleView = () => {
+        mainView.style.display = 'none';
+        kindleView.style.display = 'flex';
     };
 
     // Event listeners
@@ -183,6 +199,8 @@ document.addEventListener('DOMContentLoaded', () => {
     pauseBtn.addEventListener('click', pauseSpeaking);
     stopBtn.addEventListener('click', stopSpeaking);
     darkModeToggle.addEventListener('click', toggleDarkMode);
+    kindleBtn.addEventListener('click', showKindleView);
+    backToMainBtn.addEventListener('click', showMainView);
 
     // Update utterance properties when sliders change (if an utterance is active)
     volumeSlider.addEventListener('input', () => {
@@ -204,6 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize
     initSpeechSynthesis();
     initDarkMode();
+    showMainView(); // Start with main view visible
 });
 
 // Register service worker for offline functionality

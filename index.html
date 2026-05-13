@@ -10,27 +10,98 @@
 </head>
 <body>
     <div id="app">
-        <h1>Audiobook App <button id="dark-mode-toggle" class="dark-mode-toggle">🌙</button></h1>
-        <div class="controls">
-            <textarea id="text-input" placeholder="Paste text here or load a file..." rows="6"></textarea>
-            <div class="button-group">
-                <input type="file" id="file-input" accept=".txt">
-                <button id="load-file">Load File</button>
+        <!-- Main View -->
+        <div id="main-view" class="view">
+            <h1>Audiobook App <button id="dark-mode-toggle" class="dark-mode-toggle">○</button></h1>
+            <div class="controls">
+                <textarea id="text-input" placeholder="Paste text here or load a file..." rows="6"></textarea>
+                <div class="button-group">
+                    <input type="file" id="file-input" accept=".txt">
+                    <button id="load-file">Load File</button>
+                </div>
+                <div class="button-group">
+                    <button id="play-btn">Play</button>
+                    <button id="pause-btn">Pause</button>
+                    <button id="stop-btn">Stop</button>
+                </div>
+                <div class="settings">
+                    <label for="volume">Volume:</label>
+                    <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
+                    <label for="rate">Rate:</label>
+                    <input type="range" id="rate" min="0.1" max="2" step="0.1" value="1">
+                    <label for="pitch">Pitch:</label>
+                    <input type="range" id="pitch" min="0" max="2" step="0.1" value="1">
+                </div>
+                <div id="status"></div>
+                <div class="button-group">
+                    <button id="kindle-btn">Kindle Transcript Guide</button>
+                </div>
             </div>
-            <div class="button-group">
-                <button id="play-btn">Play</button>
-                <button id="pause-btn">Pause</button>
-                <button id="stop-btn">Stop</button>
+        </div>
+
+        <!-- Kindle Transcript Guide View -->
+        <div id="kindle-view" class="view" style="display: none;">
+            <h1>Kindle Transcript Guide <button id="back-to-main" class="back-button">← Back</button></h1>
+            <div class="kindle-instructions">
+                <h2>How to Get Text from Kindle for This App</h2>
+                <p>Since this PWA cannot directly access the Kindle app due to iOS/Android sandboxing restrictions, follow these steps to get text from your Kindle book:</p>
+
+                <ol>
+                    <li><strong>Prepare Your Kindle Book:</strong>
+                        <ul>
+                            <li>Open the Kindle app on your device</li>
+                            <li>Navigate to the book you want to convert</li>
+                            <li>Go to the beginning of the section you want to capture</li>
+                        </ul>
+                    </li>
+                    <li><strong>Enable Scroll Mode (if available):</strong>
+                        <ul>
+                            <li>Some Kindle versions have a "Scroll" or "Continuous Scrolling" mode in settings</li>
+                            <li>Enable this if available for smoother capture</li>
+                        </ul>
+                    </li>
+                    <li><strong>Capture the Text:</strong>
+                        <ul>
+                            <li>Use your device's screenshot function to capture pages of text</li>
+                            <li>For iOS: Press Side Button + Volume Up simultaneously</li>
+                            <li>For Android: Press Power + Volume Down simultaneously</li>
+                            <li>Capture each page, making sure to get all the text</li>
+                        </ul>
+                    </li>
+                    <li><strong>Extract Text from Screenshots:</strong>
+                        <ul>
+                            <li>Use an OCR (Optical Character Recognition) tool to convert images to text</li>
+                            <li>Free online options: Google Keep, Microsoft OneNote, or free OCR websites</li>
+                            <li>Mobile apps: Adobe Scan, Microsoft Lens, or Google Photos (with Google Lens)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Prepare the Text File:</strong>
+                        <ul>
+                            <li>Copy the extracted text into a plain text editor</li>
+                            <li>Clean up any OCR errors (misrecognized characters, missing spaces, etc.)</li>
+                            <li>Save as a .txt file</li>
+                            <li>Note: For DRM-protected books, this is for personal use only</li>
+                        </ul>
+                    </li>
+                    <li><strong>Use in This App:</strong>
+                        <ul>
+                            <li>Return to the main screen of this app</li>
+                            <li>Tap "Load File" and select your .txt file</li>
+                            <li>Or paste the text directly into the textarea</li>
+                            <li>Adjust volume, rate, and pitch as desired</li>
+                            <li>Tap "Play" to listen</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <div class="important-note">
+                    <h3>Important Notes:</h3>
+                    <p>• This process is for personal use only with books you own</p>
+                    <p>• Do not distribute or share copyrighted text without permission</p>
+                    <p>• The quality depends on your OCR tool and cleanup effort</p>
+                    <p>• For best results, work in small chunks (10-20 pages at a time)</p>
+                </div>
             </div>
-            <div class="settings">
-                <label for="volume">Volume:</label>
-                <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
-                <label for="rate">Rate:</label>
-                <input type="range" id="rate" min="0.1" max="2" step="0.1" value="1">
-                <label for="pitch">Pitch:</label>
-                <input type="range" id="pitch" min="0" max="2" step="0.1" value="1">
-            </div>
-            <div id="status"></div>
         </div>
     </div>
     <script src="js/utils.js"></script>
