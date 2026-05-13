@@ -1,6 +1,6 @@
-# iOS PWA for Audiobook App with Text-to-Speech and Kindle Guide
+# iOS PWA for Audiobook App with Text-to-Speech, Transcript Management, and Kindle Guide
 
-This is a Progressive Web App (PWA) designed for iOS devices that uses the Web Speech API to read text aloud. It allows users to paste text or load a text file and listen to it being read out loud. Includes a guide for extracting text from Kindle books.
+This is a Progressive Web App (PWA) designed for iOS devices that uses the Web Speech API to read text aloud. It allows users to paste text or load a text file and listen to it being read out loud. Includes features for managing transcripts with page tracking and a guide for extracting text from Kindle books.
 
 ## Features
 
@@ -9,9 +9,11 @@ This is a Progressive Web App (PWA) designed for iOS devices that uses the Web S
 - Controls for play, pause, stop
 - Adjustable volume, rate (speed), and pitch
 - Dark/Light mode toggle with simple black/white icons
+- Transcript management with page tracking
 - Offline functionality via Service Worker
 - Can be installed on iOS home screen
 - Remembers user preferences (theme, volume, rate, pitch)
+- Includes transcript saving/loading functionality
 - Includes Kindle transcript extraction guide
 - Works best when the app is visible and active (see limitations below)
 
@@ -65,14 +67,33 @@ Due to iOS and web platform restrictions:
    - Use "Pause" and "Stop" to control playback.
    - Tap the sun/moon icon in the header to toggle between light and dark mode.
 
-3. **Using the Kindle Transcript Guide**:
+3. **Managing Transcripts**:
+   - Click the "Manage Transcripts" button on the main screen
+   - View the current text in the read-only textarea
+   - Enter start and end page numbers for the current text
+   - Click "Save Transcript" to store it with page information
+   - View saved transcripts in the list below
+   - Click "Load" on a saved transcript to return it to the main editor
+   - Click "Delete" to remove a saved transcript
+   - Use the back button to return to the main screen
+
+4. **Using the Kindle Transcript Guide**:
    - Tap the "Kindle Transcript Guide" button on the main screen
    - Follow the step-by-step instructions to extract text from your Kindle book
    - Use the "← Back" button to return to the main screen
 
-4. **Offline Use**:
+5. **Offline Use**:
    - Once loaded, the PWA works offline thanks to the service worker.
    - Make sure to visit the page online at least once to cache the assets.
+
+## Transcript Management Features
+
+- Save text sections with associated page numbers for tracking progress
+- Store multiple transcript sections locally using browser storage
+- Load saved transcripts back into the editor for playback or further editing
+- Delete unwanted transcripts
+- View a preview of each saved transcript
+- See the date and time when each transcript was saved
 
 ## Deployment
 
@@ -101,7 +122,11 @@ Since this PWA cannot directly access the Kindle app due to iOS/Android sandboxi
 - **File not loading**: Ensure the file is a plain text (.txt) file.
 - **Voices not available**: The Web Speech API voices depend on the device and language settings.
 - **Theme not saving**: Make sure you're using a modern browser that supports localStorage.
-- **View navigation**: Use the Kindle Transcript Guide button to access instructions and the back button to return.
+- **Transcript not saving**: Make sure you've entered valid page numbers and text content.
+- **View navigation**: Use the appropriate buttons to navigate between views:
+  - Main → Transcripts: "Manage Transcripts" button
+  - Main → Kindle Guide: "Kindle Transcript Guide" button
+  - Any view → Main: Back button (← Back)
 
 ---
 *This app is for personal use only. Do not use for copyrighted material without permission.*

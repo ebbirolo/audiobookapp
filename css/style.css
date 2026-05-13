@@ -10,10 +10,12 @@
     --button-hover: #2980b9;
     --button-secondary-bg: #95a5a6;
     --input-border: #ddd;
-    --status-success: green;
-    --status-error: red;
+    --success-color: green;
+    --error-color: red;
     --kindle-bg: #f8f9fa;
     --kindle-border: #dee2e6;
+    --transcript-bg: #f0f8ff;
+    --transcript-border: #b0d0f0;
 }
 
 [data-theme="dark"] {
@@ -27,10 +29,12 @@
     --button-hover: #42a5f5;
     --button-secondary-bg: #757575;
     --input-border: #424242;
-    --status-success: #81c784;
-    --status-error: #e57373;
+    --success-color: #81c784;
+    --error-color: #e57373;
     --kindle-bg: #2d2d2d;
     --kindle-border: #424242;
+    --transcript-bg: #1a1a2e;
+    --transcript-border: #16213e;
 }
 
 * {
@@ -189,6 +193,149 @@ p {
     width: 100%;
 }
 
+/* Transcript Management View */
+.transcript-manager {
+    background: var(--transcript-bg);
+    border: 1px solid var(--transcript-border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.current-text-section,
+.page-input-section,
+.saved-transcripts-section {
+    margin-bottom: 20px;
+}
+
+.current-text-section h2,
+.page-input-section h2,
+.saved-transcripts-section h2 {
+    color: var(--header-color);
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+#transcript-text-display {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--input-border);
+    border-radius: 5px;
+    font-family: inherit;
+    resize: vertical;
+    background-color: var(--control-bg);
+    color: var(--text-color);
+}
+
+.input-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.input-group input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+#save-transcript-btn {
+    background-color: var(--button-bg);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s;
+    width: 100%;
+}
+
+#save-transcript-btn:hover {
+    background-color: var(--button-hover);
+}
+
+#transcripts-list {
+    margin-top: 15px;
+}
+
+.transcript-item {
+    background: var(--control-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.transcript-item-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.transcript-page-range {
+    font-weight: bold;
+    color: var(--header-color);
+}
+
+.transcript-date {
+    font-size: 0.8em;
+    color: var(--subtext-color);
+}
+
+.transcript-preview {
+    max-height: 60px;
+    overflow-y: auto;
+    font-size: 0.9em;
+    color: var(--text-color);
+    background: var(--bg-color);
+    padding: 8px;
+    border-radius: 3px;
+}
+
+.transcript-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.transcript-actions button {
+    flex: 1;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s;
+}
+
+.load-transcript-btn {
+    background-color: var(--button-bg);
+    color: white;
+}
+
+.load-transcript-btn:hover {
+    background-color: var(--button-hover);
+}
+
+.delete-transcript-btn {
+    background-color: var(--error-color);
+    color: white;
+}
+
+.delete-transcript-btn:hover {
+    background-color: #c0392b;
+}
+
 /* Kindle Instructions View */
 .kindle-instructions {
     background: var(--kindle-bg);
@@ -261,6 +408,10 @@ p {
     .button-group input[type="file"] {
         width: 100%;
         margin: 5px 0;
+    }
+
+    .transcript-manager {
+        padding: 15px;
     }
 
     .kindle-instructions {

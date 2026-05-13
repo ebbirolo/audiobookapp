@@ -21,7 +21,7 @@
                 </div>
                 <div class="button-group">
                     <button id="play-btn">Play</button>
-                    <button id="pause-btn">Pause</button>
+                    <button id="pause-btn">Pause</button
                     <button id="stop-btn">Stop</button>
                 </div>
                 <div class="settings">
@@ -34,7 +34,39 @@
                 </div>
                 <div id="status"></div>
                 <div class="button-group">
+                    <button id="transcript-btn">Manage Transcripts</button>
                     <button id="kindle-btn">Kindle Transcript Guide</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transcript Management View -->
+        <div id="transcript-view" class="view" style="display: none;">
+            <h1>Manage Transcripts <button id="transcript-back-to-main" class="back-button">← Back</button></h1>
+            <div class="transcript-manager">
+                <div class="current-text-section">
+                    <h2>Current Text</h2>
+                    <textarea id="transcript-text-display" readonly rows="8"></textarea>
+                </div>
+
+                <div class="page-input-section">
+                    <h2>Page Range</h2>
+                    <div class="input-group">
+                        <label for="start-page">Start Page:</label>
+                        <input type="number" id="start-page" min="1" placeholder="Enter start page">
+                    </div>
+                    <div class="input-group">
+                        <label for="end-page">End Page:</label>
+                        <input type="number" id="end-page" min="1" placeholder="Enter end page">
+                    </div>
+                    <button id="save-transcript-btn">Save Transcript</button>
+                </div>
+
+                <div class="saved-transcripts-section">
+                    <h2>Saved Transcripts</h2>
+                    <div id="transcripts-list">
+                        <!-- Transcripts will be dynamically inserted here -->
+                    </div>
                 </div>
             </div>
         </div>

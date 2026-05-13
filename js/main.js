@@ -1,4 +1,4 @@
-// Main JavaScript for Audiobook PWA with TTS, Dark Mode, and View Management
+// Main JavaScript for Audiobook PWA with TTS, Dark Mode, and Transcript Management
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Audiobook PWA with TTS loaded');
 
@@ -14,10 +14,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const pitchSlider = document.getElementById('pitch');
     const statusEl = document.getElementById('status');
     const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const transcriptBtn = document.getElementById('transcript-btn');
     const kindleBtn = document.getElementById('kindle-btn');
-    const backToMainBtn = document.getElementById('back-to-main');
+
+    // View elements
     const mainView = document.getElementById('main-view');
+    const transcriptView = document.getElementById('transcript-view');
     const kindleView = document.getElementById('kindle-view');
+
+    // Transcript view elements
+    const transcriptBackToMainBtn = document.getElementById('transcript-back-to-main');
+    const transcriptTextDisplay = document.getElementById('transcript-text-display');
+    const startPageInput = document.getElementById('start-page');
+    const endPageInput = document.getElementById('end-page');
+    const saveTranscriptBtn = document.getElementById('save-transcript-btn');
+    const transcriptsList = document.getElementById('transcripts-list');
+
+    const backToMainBtn = document.getElementById('back-to-main');
 
     // Speech synthesis
     let utterance = null;
@@ -185,12 +198,114 @@ document.addEventListener('DOMContentLoaded', () => {
     // View management
     const showMainView = () => {
         mainView.style.display = 'flex';
+        transcriptView.style.display = 'none';
         kindleView.style.display = 'none';
+    };
+
+    const showTranscriptView = () => {
+        mainView.style.display = 'none';
+        transcriptView.style.display = 'flex';
+        kindleView.style.display = 'none';
+        // Update transcript text display when showing the view
+        transcriptTextDisplay.value = textInput.value;
+        // Refresh the transcripts list
+        renderTranscriptsList();
     };
 
     const showKindleView = () => {
         mainView.style.display = 'none';
+        transcriptView.style.display = 'none';
         kindleView.style.display = 'flex';
+    };
+
+    // Transcript management
+    const loadTranscriptsFromStorage = () => {
+        const transcripts = localStorage.getItem('transcripts');
+        return transcripts ? JSON.parse(transcripts) : [];
+    };
+
+    const saveTranscriptsToStorage = (transcripts) => {
+        localStorage.setItem('transcripts', JSON.stringify(transcripts));
+    };
+
+    const addTranscript = (text, startPage, endPage) => {
+        const transcripts = loadTranscriptsFromStorage();
+        const newTranscript = {
+            id: Date.now(), // Simple ID based on timestamp
+            text: text,
+            startPage: parseInt(startPage) || 1,
+            endPage: parseInt(endPage) || 1,
+            timestamp: new Date().toISOString()
+        };
+        transcripts.push(newTranscript);
+        saveTranscriptsToStorage(transcripts);
+        return newTranscript;
+    };
+
+    const deleteTranscript = (id) => {
+        let transcripts = loadTranscriptsFromStorage();
+        transcripts = transcripts.filter(t => t.id !== id);
+        saveTranscriptsToStorage(transcripts);
+        renderTranscriptsList();
+    };
+
+    const loadTranscriptToEditor = (transcript) => {
+        textInput.value = transcript.text;
+        startPageInput.value = transcript.startPage;
+        endPageInput.value = transcript.endPage;
+        setStatus('Transcript loaded. Return to main view to play or edit.', false);
+        showMainView();
+    };
+
+    const renderTranscriptsList = () => {
+        const transcripts = loadTranscriptsFromStorage();
+        transcriptsList.innerHTML = '';
+
+        if (transcripts.length === 0) {
+            transcriptsList.innerHTML = '<p>No transcripts saved yet.</p>';
+            return;
+        }
+
+        transcripts.forEach(transcript => {
+            const transcriptElement = document.createElement('div');
+            transcriptElement.className = 'transcript-item';
+
+            const date = new Date(transcript.timestamp);
+            const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+            transcriptElement.innerHTML = `
+                <div class="transcript-item-header">
+                    <div class="transcript-page-range">Pages ${transcript.startPage}-${transcript.endPage}</div>
+                    <div class="transcript-date">${formattedDate}</div>
+                </div>
+                <div class="transcript-preview">${transcript.text.substring(0, 100)}${transcript.text.length > 100 ? '...' : ''}</div>
+                <div class="transcript-actions">
+                    <button class="load-transcript-btn" data-id="${transcript.id}">Load</button>
+                    <button class="delete-transcript-btn" data-id="${transcript.id}">Delete</button>
+                </div>
+            `;
+
+            transcriptsList.appendChild(transcriptElement);
+        });
+
+        // Add event listeners to the buttons in the list
+        document.querySelectorAll('.load-transcript-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const id = parseInt(e.target.dataset.id);
+                const transcripts = loadTranscriptsFromStorage();
+                const transcript = transcripts.find(t => t.id === id);
+                if (transcript) {
+                    loadTranscriptToEditor(transcript);
+                }
+            });
+        });
+
+        document.querySelectorAll('.delete-transcript-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const id = parseInt(e.target.dataset.id);
+                deleteTranscript(id);
+            });
+        });
     };
 
     // Event listeners
@@ -199,8 +314,41 @@ document.addEventListener('DOMContentLoaded', () => {
     pauseBtn.addEventListener('click', pauseSpeaking);
     stopBtn.addEventListener('click', stopSpeaking);
     darkModeToggle.addEventListener('click', toggleDarkMode);
+    transcriptBtn.addEventListener('click', showTranscriptView);
     kindleBtn.addEventListener('click', showKindleView);
+    transcriptBackToMainBtn.addEventListener('click', showMainView);
     backToMainBtn.addEventListener('click', showMainView);
+
+    saveTranscriptBtn.addEventListener('click', () => {
+        const text = textInput.value.trim();
+        const startPage = startPageInput.value;
+        const endPage = endPageInput.value;
+
+        if (!text) {
+            setStatus('Please enter some text to save.', true);
+            return;
+        }
+
+        if (!startPage || !endPage) {
+            setStatus('Please enter both start and end page numbers.', true);
+            return;
+        }
+
+        if (isNaN(startPage) || isNaN(endPage) || parseInt(startPage) < 1 || parseInt(endPage) < 1) {
+            setStatus('Please enter valid page numbers (positive integers).', true);
+            return;
+        }
+
+        const transcript = addTranscript(text, startPage, endPage);
+        setStatus(`Transcript saved for pages ${transcript.startPage}-${transcript.endPage}.`, false);
+
+        // Clear the form
+        startPageInput.value = '';
+        endPageInput.value = '';
+
+        // Refresh the list
+        renderTranscriptsList();
+    });
 
     // Update utterance properties when sliders change (if an utterance is active)
     volumeSlider.addEventListener('input', () => {
