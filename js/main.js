@@ -1,4 +1,4 @@
-// Main JavaScript for Audiobook PWA with TTS
+// Main JavaScript for Audiobook PWA with TTS and Dark Mode
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Audiobook PWA with TTS loaded');
 
@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const rateSlider = document.getElementById('rate');
     const pitchSlider = document.getElementById('pitch');
     const statusEl = document.getElementById('status');
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
 
     // Speech synthesis
     let utterance = null;
@@ -141,11 +142,47 @@ document.addEventListener('DOMContentLoaded', () => {
         stopBtn.disabled = true;
     };
 
+    // Dark mode functionality
+    const initDarkMode = () => {
+        // Check for saved user preference or use system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateDarkModeIcon(savedTheme === 'dark');
+        } else if (systemPrefersDark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            updateDarkModeIcon(true);
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            updateDarkModeIcon(false);
+        }
+    };
+
+    const toggleDarkMode = () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateDarkModeIcon(newTheme === 'dark');
+    };
+
+    const updateDarkModeIcon = (isDark) => {
+        if (isDark) {
+            darkModeToggle.textContent = '☀️'; // Sun for light mode (when currently in dark)
+        } else {
+            darkModeToggle.textContent = '🌙'; // Moon for dark mode (when currently in light)
+        }
+    };
+
     // Event listeners
     loadFileBtn.addEventListener('click', loadFile);
     playBtn.addEventListener('click', startSpeaking);
     pauseBtn.addEventListener('click', pauseSpeaking);
     stopBtn.addEventListener('click', stopSpeaking);
+    darkModeToggle.addEventListener('click', toggleDarkMode);
 
     // Update utterance properties when sliders change (if an utterance is active)
     volumeSlider.addEventListener('input', () => {
@@ -166,6 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize
     initSpeechSynthesis();
+    initDarkMode();
 });
 
 // Register service worker for offline functionality

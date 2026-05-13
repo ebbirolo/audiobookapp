@@ -8,8 +8,10 @@ This is a Progressive Web App (PWA) designed for iOS devices that uses the Web S
 - Load text from a .txt file or paste directly into the textarea
 - Controls for play, pause, stop
 - Adjustable volume, rate (speed), and pitch
+- Dark/Light mode toggle
 - Offline functionality via Service Worker
 - Can be installed on iOS home screen
+- Remembers user preferences (theme, volume, rate, pitch)
 - Works best when the app is visible and active (see limitations below)
 
 ## Limitations
@@ -60,6 +62,7 @@ Due to iOS and web platform restrictions:
    - Adjust volume, rate, and pitch sliders as desired.
    - Tap "Play" to start listening.
    - Use "Pause" and "Stop" to control playback.
+   - Tap the sun/moon icon in the header to toggle between light and dark mode.
 
 3. **Offline Use**:
    - Once loaded, the PWA works offline thanks to the service worker.
@@ -81,6 +84,7 @@ See [docs/deployment.md](docs/deployment.md) for detailed instructions on deploy
 - **Speech not starting**: Make sure you tapped the Play button after entering text.
 - **File not loading**: Ensure the file is a plain text (.txt) file.
 - **Voices not available**: The Web Speech API voices depend on the device and language settings.
+- **Theme not saving**: Make sure you're using a modern browser that supports localStorage.
 
 ---
 *This app is for personal use only. Do not use for copyrighted material without permission.*
