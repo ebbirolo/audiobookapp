@@ -1,0 +1,37 @@
+{
+  "name": "Audiobook TTS App",
+  "short_name": "Audiobook TTS",
+  "description": "A Progressive Web App that reads text aloud using Text-to-Speech. Load text from file or paste and listen.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icons/icon-1024x1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ],
+  "splash_pages": [
+    {
+      "src": "assets/splash/splash-iphone-12.png",
+      "media": "(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)"
+    },
+    {
+      "src": "assets/splash/splash-iphone-13.png",
+      "media": "(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)"
+    }
+  ]
+}
