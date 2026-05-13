@@ -193,6 +193,15 @@ p {
     width: 100%;
 }
 
+/* Help text styling */
+.help-text {
+    font-size: 0.9rem;
+    color: var(--subtext-color);
+    font-style: italic;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
 /* Transcript Management View */
 .transcript-manager {
     background: var(--transcript-bg);

@@ -320,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
     backToMainBtn.addEventListener('click', showMainView);
 
     saveTranscriptBtn.addEventListener('click', () => {
-        const text = textInput.value.trim();
+        const text = transcriptTextDisplay.value.trim();
         const startPage = startPageInput.value;
         const endPage = endPageInput.value;
 
