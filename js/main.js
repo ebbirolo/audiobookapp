@@ -12,6 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const volumeSlider = document.getElementById('volume');
     const rateSlider = document.getElementById('rate');
     const pitchSlider = document.getElementById('pitch');
+    const voiceSelect = document.getElementById('voice-select');
+    const femaleVoiceBtn = document.getElementById('female-voice-btn');
     const statusEl = document.getElementById('status');
     const darkModeToggle = document.getElementById('dark-mode-toggle');
     const transcriptBtn = document.getElementById('transcript-btn');
@@ -35,19 +37,51 @@ document.addEventListener('DOMContentLoaded', () => {
     // Speech synthesis
     let utterance = null;
     let isPlaying = false;
+    let currentCharIndex = 0; // Track current position in text
+    let isPaused = false; // Track if we're paused vs stopped
+    let voices = []; // Available voices
+    let selectedVoice = null; // Currently selected voice
 
     // Initialize speech synthesis
     const initSpeechSynthesis = () => {
         if ('speechSynthesis' in window) {
-            // Voices may not be loaded immediately, so we wait a bit
-            setTimeout(() => {
-                const voices = speechSynthesis.getVoices();
-                if (voices.length > 0) {
-                    console.log('Voices loaded:', voices.length);
-                } else {
-                    console.warn('No voices available yet');
+            // Load voices and handle async loading
+            const loadVoices = () => {
+                voices = speechSynthesis.getVoices();
+                // Filter for English voices if needed, or show all
+                const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
+                const voicesToShow = englishVoices.length > 0 ? englishVoices : voices;
+
+                // Populate voice select dropdown
+                voiceSelect.innerHTML = '<option value="">Select voice (default)</option>';
+                voicesToShow.forEach((voice, index) => {
+                    const option = document.createElement('option');
+                    option.value = index; // Store index in voicesToShow array
+                    option.textContent = `${voice.name} ${voice.lang}${voice.default ? ' (default)' : ''}${voice.localService ? ' (local)' : ''}`;
+                    voiceSelect.appendChild(option);
+                });
+
+                // Try to select a female voice by default if available
+                const femaleVoiceIndex = voicesToShow.findIndex(voice =>
+                    voice.name.toLowerCase().includes('female') ||
+                    voice.name.toLowerCase().includes('woman') ||
+                    voice.name.includes('Samantha') ||
+                    voice.name.includes('Victoria') ||
+                    voice.name.includes('Kate') ||
+                    voice.gender === 'female'
+                );
+
+                if (femaleVoiceIndex !== -1) {
+                    voiceSelect.selectedIndex = femaleVoiceIndex + 1; // +1 because of the placeholder option
+                    selectedVoice = voicesToShow[femaleVoiceIndex];
                 }
-            }, 100);
+            };
+
+            // Load voices initially
+            loadVoices();
+
+            // Listen for voices to be loaded
+            speechSynthesis.onvoiceschanged = loadVoices;
         } else {
             statusEl.textContent = 'Speech Synthesis not supported in this browser.';
             statusEl.style.color = 'red';
@@ -98,21 +132,63 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // If we're paused, ask user what they want to do
+        if (isPaused) {
+            const userChoice = window.confirm(
+                'Speech is paused. Do you want to:\n\n' +
+                'OK: Continue from where you left off\n' +
+                'Cancel: Delete everything behind and start from current position'
+            );
+
+            if (userChoice) {
+                // User chose to continue from where they left off
+                // Just resume the speech synthesis
+                speechSynthesis.resume();
+                isPlaying = true;
+                isPaused = false;
+                setStatus('Speaking...');
+                playBtn.disabled = true;
+                pauseBtn.disabled = false;
+                stopBtn.disabled = false;
+                return;
+            } else {
+                // User chose to delete everything behind
+                // Remove the text that has already been spoken
+                const remainingText = text.substring(currentCharIndex);
+                textInput.value = remainingText;
+                currentCharIndex = 0; // Reset position since we removed the spoken part
+                // Fall through to start speaking the remaining text
+            }
+        }
+
         // Cancel any ongoing utterance
         if (speechSynthesis.speaking) {
             speechSynthesis.cancel();
         }
 
-        utterance = new SpeechSynthesisUtterance(text);
+        utterance = new SpeechSynthesisUtterance(textInput.value.trim());
         utterance.volume = parseFloat(volumeSlider.value);
         utterance.rate = parseFloat(rateSlider.value);
         utterance.pitch = parseFloat(pitchSlider.value);
+
+        // Use selected voice if available
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+        }
+
+        // Track current position in text
+        utterance.onboundary = (event) => {
+            if (event.name === 'word' || event.name === 'sentence') {
+                currentCharIndex = event.charIndex;
+            }
+        };
 
         // Optional: set voice (we can let the user choose later if needed)
         // utterance.voice = speechSynthesis.getVoices().find(v => v.lang === 'en-US');
 
         utterance.onstart = () => {
             isPlaying = true;
+            isPaused = false;
             setStatus('Speaking...');
             playBtn.disabled = true;
             pauseBtn.disabled = false;
@@ -121,6 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         utterance.onend = () => {
             isPlaying = false;
+            isPaused = false;
             setStatus('Speech completed.');
             playBtn.disabled = false;
             pauseBtn.disabled = true;
@@ -129,6 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         utterance.onerror = (e) => {
             isPlaying = false;
+            isPaused = false;
             setStatus('Error in speech synthesis: ' + e.error, true);
             playBtn.disabled = false;
             pauseBtn.disabled = true;
@@ -143,6 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (speechSynthesis.speaking && !speechSynthesis.paused) {
             speechSynthesis.pause();
             isPlaying = false;
+            isPaused = true; // Mark as paused (not stopped)
             setStatus('Speech paused.');
             playBtn.disabled = false;
             pauseBtn.disabled = true;
@@ -153,6 +232,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const stopSpeaking = () => {
         speechSynthesis.cancel();
         isPlaying = false;
+        isPaused = false; // Reset paused state when stopping
+        currentCharIndex = 0; // Reset position when stopping
         setStatus('Speech stopped.');
         playBtn.disabled = false;
         pauseBtn.disabled = true;
@@ -318,6 +399,62 @@ document.addEventListener('DOMContentLoaded', () => {
     kindleBtn.addEventListener('click', showKindleView);
     transcriptBackToMainBtn.addEventListener('click', showMainView);
     backToMainBtn.addEventListener('click', showMainView);
+    voiceSelect.addEventListener('change', () => {
+        const selectedIndex = parseInt(voiceSelect.value);
+        // We need to get the actual voices array that matches the options
+        // Since we populate the dropdown with filtered voices, we need to apply the same filtering
+        const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
+        const voicesToShow = englishVoices.length > 0 ? englishVoices : voices;
+
+        if (!isNaN(selectedIndex) && voicesToShow[selectedIndex]) {
+            selectedVoice = voicesToShow[selectedIndex];
+            setStatus(`Voice changed to: ${selectedVoice.name}`);
+        } else {
+            selectedVoice = null;
+            setStatus('Voice changed to: default');
+        }
+    });
+
+    // Female voice button
+    femaleVoiceBtn.addEventListener('click', () => {
+        if (voices.length === 0) {
+            setStatus('No voices available yet. Please wait for voices to load.', true);
+            return;
+        }
+
+        // Filter for English voices first
+        const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
+        const voicesToSearch = englishVoices.length > 0 ? englishVoices : voices;
+
+        // Look for a female voice
+        const femaleVoice = voicesToSearch.find(voice =>
+            voice.name.toLowerCase().includes('female') ||
+            voice.name.toLowerCase().includes('woman') ||
+            voice.name.includes('Samantha') ||
+            voice.name.includes('Victoria') ||
+            voice.name.includes('Kate') ||
+            voice.gender === 'female'
+        );
+
+        if (femaleVoice) {
+            // Find the index in the dropdown
+            const englishVoicesForDropdown = voices.filter(voice => voice.lang.startsWith('en'));
+            const voicesToShowForDropdown = englishVoicesForDropdown.length > 0 ? englishVoicesForDropdown : voices;
+            const indexInDropdown = voicesToShowForDropdown.indexOf(femaleVoice);
+
+            if (indexInDropdown !== -1) {
+                voiceSelect.selectedIndex = indexInDropdown + 1; // +1 for placeholder
+            } else {
+                // Fallback: just set the voice directly
+                voiceSelect.selectedIndex = 0; // Reset to default
+            }
+
+            selectedVoice = femaleVoice;
+            setStatus(`Voice changed to female voice: ${femaleVoice.name}`);
+        } else {
+            setStatus('No female voice found in available voices.', true);
+        }
+    });
 
     saveTranscriptBtn.addEventListener('click', () => {
         const text = transcriptTextDisplay.value.trim();

@@ -4,7 +4,9 @@
       "PowerShell(python --version)",
       "PowerShell(python -c \"from PIL import Image; print\\('Pillow available'\\)\")",
       "PowerShell(pip install *)",
-      "PowerShell(python generate_icon.py)"
+      "PowerShell(python generate_icon.py)",
+      "Bash(node *)",
+      "WebSearch"
     ]
   }
 }
